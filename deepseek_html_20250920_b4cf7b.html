@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solara S2 Minecraft Server</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a86e8;
+            --secondary: #3a5bb8;
+            --accent: #00c6ff;
+            --dark: #1a1a2e;
+            --darker: #0d0d1a;
+            --light: #f0f0f0;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            --card-gradient: linear-gradient(135deg, rgba(30, 60, 114, 0.8) 0%, rgba(0, 135, 175, 0.8) 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(26, 26, 46, 0.8);
+            border-bottom: 1px solid rgba(74, 134, 232, 0.3);
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 15px var(--accent), 0 0 30px rgba(0, 198, 255, 0.3);
+            animation: glow 3s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 15px var(--accent), 0 0 30px rgba(0, 198, 255, 0.3);
+            }
+            to {
+                box-shadow: 0 0 25px var(--accent), 0 0 50px rgba(0, 198, 255, 0.5);
+            }
+        }
+        
+        .server-title {
+            margin-left: 15px;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .tagline {
+            font-size: 1rem;
+            color: var(--accent);
+            font-style: italic;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .nav-sidebar {
+            width: 220px;
+            background: rgba(26, 26, 46, 0.7);
+            padding: 20px 0;
+            border-right: 1px solid rgba(74, 134, 232, 0.3);
+        }
+        
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-btn i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .nav-btn.active {
+            background: rgba(74, 134, 232, 0.2);
+            border-left: 4px solid var(--accent);
+            color: var(--accent);
+        }
+        
+        .nav-btn:hover {
+            background: rgba(74, 134, 232, 0.1);
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .card {
+            background: var(--card-gradient);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(74, 134, 232, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-item {
+            background: rgba(13, 13, 26, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(0, 198, 255, 0.3);
+        }
+        
+        .info-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 198, 255, 0.2);
+        }
+        
+        .ip-address {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .ip-address:hover {
+            transform: scale(1.05);
+        }
+        
+        .copy-btn {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .copy-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .copy-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0, 1);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+        
+        .copy-btn:hover::after {
+            transform: scale(1, 1);
+            transform-origin: left;
+        }
+        
+        .rules-list {
+            list-style: none;
+        }
+        
+        .rules-list li {
+            background: rgba(26, 26, 46, 0.6);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .rules-list i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .discord {
+            background: linear-gradient(45deg, #5865f2, #4752c4);
+        }
+        
+        .youtube {
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-5px) rotate(5deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: rgba(26, 26, 46, 0.8);
+            border-top: 1px solid rgba(74, 134, 232, 0.3);
+        }
+        
+        .admin-name {
+            color: var(--accent);
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .nav-sidebar {
+                width: 100%;
+                display: flex;
+                overflow-x: auto;
+                padding: 10px 0;
+            }
+            
+            .nav-btn {
+                flex-direction: column;
+                padding: 10px;
+                font-size: 0.8rem;
+                border-left: none;
+                border-bottom: 4px solid transparent;
+            }
+            
+            .nav-btn i {
+                margin-right: 0;
+                margin-bottom: 5px;
+                font-size: 1.2rem;
+            }
+            
+            .nav-btn.active {
+                border-left: none;
+                border-bottom: 4px solid var(--accent);
+            }
+            
+            .ip-address {
+                font-size: 1.2rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .join-steps {
+            margin-top: 20px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .step-number {
+            background: var(--gradient);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        /* Leaderboard Styles */
+        .leaderboard {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(13, 13, 26, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .leaderboard th {
+            background: var(--gradient);
+            padding: 12px 15px;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .leaderboard tr {
+            border-bottom: 1px solid rgba(74, 134, 232, 0.2);
+        }
+        
+        .leaderboard tr:last-child {
+            border-bottom: none;
+        }
+        
+        .leaderboard td {
+            padding: 12px 15px;
+        }
+        
+        .leaderboard tr:nth-child(even) {
+            background: rgba(26, 26, 46, 0.4);
+        }
+        
+        .leaderboard tr:hover {
+            background: rgba(74, 134, 232, 0.1);
+        }
+        
+        .rank {
+            font-weight: bold;
+            text-align: center;
+            width: 50px;
+        }
+        
+        .player {
+            display: flex;
+            align-items: center;
+        }
+        
+        .player-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .kd-ratio {
+            font-weight: bold;
+        }
+        
+        .positive {
+            color: #4caf50;
+        }
+        
+        .negative {
+            color: #f44336;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(13, 13, 26, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+            border: 1px solid rgba(0, 198, 255, 0.3);
+        }
+        
+        .stat-card:first-child {
+            margin-left: 0;
+        }
+        
+        .stat-card:last-child {
+            margin-right: 0;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+        
+        /* Animation for copy button */
+        @keyframes clickAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        
+        .clicked {
+            animation: clickAnimation 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <img src="https://i.ibb.co/yntbkF44/SolaraS2.jpg" alt="Solara S2 Logo" class="logo">
+            <div class="server-title">
+                <h1>Solara S2</h1>
+                <p class="tagline">"Only pro will survive"</p>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="nav-sidebar">
+                <a href="#" class="nav-btn active" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-btn" data-page="info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Server Info</span>
+                </a>
+                <a href="#" class="nav-btn" data-page="rules">
+                    <i class="fas fa-gavel"></i>
+                    <span>Rules</span>
+                </a>
+                <a href="#" class="nav-btn" data-page="join">
+                    <i class="fas fa-door-open"></i>
+                    <span>How to Join</span>
+                </a>
+                <a href="#" class="nav-btn" data-page="leaderboard">
+                    <i class="fas fa-trophy"></i>
+                    <span>Leaderboard</span>
+                </a>
+                <a href="#" class="nav-btn" data-page="social">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Social Links</span>
+                </a>
+            </div>
+            
+            <div class="content-area">
+                <!-- Home Page -->
+                <div class="page active" id="home">
+                    <div class="card">
+                        <h2>Welcome to Solara S2</h2>
+                        <p>Experience the ultimate Minecraft survival challenge where only the pros survive. Join our competitive PvP environment with griefing allowed and no teleport safety.</p>
+                        
+                        <div class="info-grid" style="margin-top: 20px;">
+                            <div class="info-item">
+                                <i class="fas fa-fist-raised fa-2x"></i>
+                                <h3>PvP 24/7</h3>
+                                <p>Fight anytime, anywhere</p>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-house-damage fa-2x"></i>
+                                <h3>Griefing Allowed</h3>
+                                <p>Steal and raid bases</p>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-skull-crossbones fa-2x"></i>
+                                <h3>Hardcore Loot</h3>
+                                <p>Inventory drops on death</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>Quick Connect</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <h3>Java Edition</h3>
+                                <p class="ip-address">SmpSolaraS2.aternos.me</p>
+                                <button class="copy-btn" data-ip="SmpSolaraS2.aternos.me">Copy IP</button>
+                            </div>
+                            
+                            <div class="info-item">
+                                <h3>Bedrock Edition</h3>
+                                <p class="ip-address">SmpSolaraS2.aternos.me</p>
+                                <p>Port: <strong>61524</strong></p>
+                                <button class="copy-btn" data-ip="SmpSolaraS2.aternos.me:61524">Copy IP</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Server Info Page -->
+                <div class="page" id="info">
+                    <div class="card">
+                        <h2>Server Information</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <i class="fas fa-server fa-2x"></i>
+                                <h3>Server IP</h3>
+                                <p class="ip-address">SmpSolaraS2.aternos.me</p>
+                                <p>Port: <strong>61524</strong> (Bedrock)</p>
+                                <button class="copy-btn" data-ip="SmpSolaraS2.aternos.me">Copy IP</button>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-code-branch fa-2x"></i>
+                                <h3>Version</h3>
+                                <p>Any version supported</p>
+                                <p>ViaVersion enabled</p>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-plug fa-2x"></i>
+                                <h3>Hosting</h3>
+                                <p>Powered by Aternos</p>
+                                <p>Always online</p>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-user-shield fa-2x"></i>
+                                <h3>Admins</h3>
+                                <p>Farhan Khan</p>
+                                <p>aka LegendWar</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>Server Features</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <i class="fas fa-seedling fa-2x"></i>
+                                <h3>Auto-Replant</h3>
+                                <p>Farms replant automatically</p>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-mountain fa-2x"></i>
+                                <h3>Anti-Trample</h3>
+                                <p>Crops won't be trampled</p>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-bed fa-2x"></i>
+                                <h3>No Teleport</h3>
+                                <p>Beds & Nether travel only</p>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-balance-scale fa-2x"></i>
+                                <h3>Fair Play</h3>
+                                <p>Clear grief gets rolled back</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rules Page -->
+                <div class="page" id="rules">
+                    <div class="card">
+                        <h2>Server Rules</h2>
+                        <p>Failure to follow these rules will result in punishments ranging from mutes to permanent bans.</p>
+                        
+                        <ul class="rules-list">
+                            <li><i class="fas fa-ban"></i> No hacks / exploits / x-ray → instant ban</li>
+                            <li><i class="fas fa-fist-raised"></i> PvP 24/7 → inventory drops on death</li>
+                            <li><i class="fas fa-house-damage"></i> Builds can be griefed/stolen → only clear grief rolled back</li>
+                            <li><i class="fas fa-bed"></i> No teleport safety → beds & Nether only</li>
+                            <li><i class="fas fa-seedling"></i> Auto-replant & anti-trample active</li>
+                            <li><i class="fas fa-comment"></i> English only in global chat → spam/toxicity = mute</li>
+                            <li><i class="fas fa-exclamation-triangle"></i> Real-life threats = permanent ban</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- How to Join Page -->
+                <div class="page" id="join">
+                    <div class="card">
+                        <h2>How to Join - Java Edition</h2>
+                        <div class="join-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">Open Minecraft Java Edition</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">Click on "Multiplayer"</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">Click "Add Server"</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">Enter server name and IP: <strong>SmpSolaraS2.aternos.me</strong></div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">Click "Done" and join the server!</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>How to Join - Bedrock Edition</h2>
+                        <div class="join-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">Open Minecraft Bedrock Edition</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">Click on "Play"</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">Go to the "Servers" tab</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">Add the server with IP: <strong>SmpSolaraS2.aternos.me</strong> and Port: <strong>61524</strong></div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">Join and start playing!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Leaderboard Page -->
+                <div class="page" id="leaderboard">
+                    <div class="card">
+                        <h2>Player Leaderboard</h2>
+                        <p>Top players based on kills and performance. Updated daily.</p>
+                        
+                        <div class="stats">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Players</div>
+                                <div class="stat-value">42</div>
+                                <div class="stat-desc">Active this week</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-label">Total Kills</div>
+                                <div class="stat-value">1,247</div>
+                                <div class="stat-desc">Since server start</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-label">Top K/D Ratio</div>
+                                <div class="stat-value">8.7</div>
+                                <div class="stat-desc">Player: ShadowAssassin</div>
+                            </div>
+                        </div>
+                        
+                        <table class="leaderboard">
+                            <thead>
+                                <tr>
+                                    <th class="rank">#</th>
+                                    <th>Player</th>
+                                    <th>Kills</th>
+                                    <th>Deaths</th>
+                                    <th>K/D Ratio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="rank">1</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">S</div>
+                                            <div>ShadowAssassin</div>
+                                        </div>
+                                    </td>
+                                    <td>147</td>
+                                    <td>17</td>
+                                    <td class="kd-ratio positive">8.65</td>
+                                </tr>
+                                <tr>
+                                    <td class="rank">2</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">N</div>
+                                            <div>NetherKing</div>
+                                        </div>
+                                    </td>
+                                    <td>132</td>
+                                    <td>24</td>
+                                    <td class="kd-ratio positive">5.50</td>
+                                </tr>
+                                <tr>
+                                    <td class="rank">3</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">D</div>
+                                            <div>DiamondMiner</div>
+                                        </div>
+                                    </td>
+                                    <td>118</td>
+                                    <td>32</td>
+                                    <td class="kd-ratio positive">3.69</td>
+                                </tr>
+                                <tr>
+                                    <td class="rank">4</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">E</div>
+                                            <div>EnderWizard</div>
+                                        </div>
+                                    </td>
+                                    <td>95</td>
+                                    <td>28</td>
+                                    <td class="kd-ratio positive">3.39</td>
+                                </tr>
+                                <tr>
+                                    <td class="rank">5</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">C</div>
+                                            <div>CreeperHunter</div>
+                                        </div>
+                                    </td>
+                                    <td>87</td>
+                                    <td>31</td>
+                                    <td class="kd-ratio positive">2.81</td>
+                                </tr>
+                                <tr>
+                                    <td class="rank">6</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">R</div>
+                                            <div>RedstoneGuru</div>
+                                        </div>
+                                    </td>
+                                    <td>64</td>
+                                    <td>45</td>
+                                    <td class="kd-ratio positive">1.42</td>
+                                </tr>
+                                <tr>
+                                    <td class="rank">7</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">B</div>
+                                            <div>BuilderPro</div>
+                                        </div>
+                                    </td>
+                                    <td>52</td>
+                                    <td>48</td>
+                                    <td class="kd-ratio positive">1.08</td>
+                                </tr>
+                                <tr>
+                                    <td class="rank">8</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">F</div>
+                                            <div>FarmerJoe</div>
+                                        </div>
+                                    </td>
+                                    <td>41</td>
+                                    <td>39</td>
+                                    <td class="kd-ratio positive">1.05</td>
+                                </tr>
+                                <tr>
+                                    <td class="rank">9</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">N</div>
+                                            <div>NewPlayer42</div>
+                                        </div>
+                                    </td>
+                                    <td>23</td>
+                                    <td>37</td>
+                                    <td class="kd-ratio negative">0.62</td>
+                                </tr>
+                                <tr>
+                                    <td class="rank">10</td>
+                                    <td>
+                                        <div class="player">
+                                            <div class="player-avatar">M</div>
+                                            <div>MinecraftNoob</div>
+                                        </div>
+                                    </td>
+                                    <td>15</td>
+                                    <td>42</td>
+                                    <td class="kd-ratio negative">0.36</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Social Links Page -->
+                <div class="page" id="social">
+                    <div class="card">
+                        <h2>Connect With Us</h2>
+                        <p>Join our community to stay updated with server news, events, and connect with other players.</p>
+                        
+                        <div class="social-links">
+                            <a href="https://discord.gg/ncYqcw4zBq" class="social-btn discord" target="_blank">
+                                <i class="fab fa-discord"></i>
+                            </a>
+                            <a href="https://youtube.com/@legendwar7" class="social-btn youtube" target="_blank">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 20px;">
+                            <p>Server owned and managed by <span class="admin-name">Farhan Khan aka LegendWar</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2025 Solara S2 Minecraft Server. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Navigation functionality
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const pages = document.querySelectorAll('.page');
+        
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const pageId = btn.getAttribute('data-page');
+                
+                // Remove active class from all buttons and pages
+                navBtns.forEach(b => b.classList.remove('active'));
+                pages.forEach(p => p.classList.remove('active'));
+                
+                // Add active class to current button and page
+                btn.classList.add('active');
+                document.getElementById(pageId).classList.add('active');
+            });
+        });
+        
+        // Copy IP functionality with improved feedback
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const ip = this.getAttribute('data-ip');
+                
+                // Add click animation
+                this.classList.add('clicked');
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(ip).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied!';
+                    
+                    // Change button style temporarily
+                    this.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
+                    
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.style.background = '';
+                        this.classList.remove('clicked');
+                    }, 2000);
+                });
+            });
+        });
+        
+        // Add subtle animations to elements when they come into view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for animation
+        document.querySelectorAll('.info-item, .rules-list li, .social-btn, .leaderboard tr').forEach(el => {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(el);
+        });
+        
+        // Simulate loading leaderboard data
+        setTimeout(() => {
+            const rows = document.querySelectorAll('.leaderboard tr');
+            rows.forEach((row, index) => {
+                setTimeout(() => {
+                    row.style.opacity = 1;
+                    row.style.transform = 'translateX(0)';
+                }, 100 * index);
+            });
+        }, 500);
+    </script>
+</body>
+</html>
